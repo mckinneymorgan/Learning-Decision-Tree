@@ -1,65 +1,97 @@
 # Original author: Morgan McKinney
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
+import anytree
+import discretization
 import csv
 
 # User input, get filename(s)
 print("MACHINE LEARNING DECISION TREE \n")
 file = input("Enter csv file name: ")
+classLabelFileExist = False
 classLabelFile = input("Are the class labels in another file (Y/N): ")
 if classLabelFile.lower() == 'y':
     classLabelFile = input("Enter class label file name: ")
-
-features = []
-classLabel = []
+    classLabelFileExist = True
 featureNames = False
-if file == 'pokemonStats.csv':
+featureNamesExist = input("Are the features named (Y/N): ")
+if featureNamesExist.lower() == 'y':
     featureNames = True
+
+data = []
 with open(file) as csvfile:
     readCSV = csv.reader(csvfile, delimiter=',')
-    if featureNames:
-        for row in readCSV:
 
-            print(row)
+    # Count features, return to start of file
+    featureCount = len(next(readCSV))
+    if not classLabelFileExist:
+        featureCount -= 1
+    csvfile.seek(0)
+    print(featureCount)
+
+    for x in range(featureCount):
+        data.append([])
+    print(data)
+
+    # Name features, if provided
+    if featureNames:
+        names = next(readCSV)
+        if not classLabelFileExist:
+            names.pop()
+        csvfile.seek(0)
+    else:
+        names = range(0, featureCount)
+    print(names)
+
+    if not featureNames:
+        for row in readCSV:
+            for x in range(featureCount):  # Populate value
+                data[x].append(dict(name=x, value=row[x]))
+                # print(data[x])
+
+    else:
+        names = next(readCSV)
+        # print(names)
+        for row in readCSV:
+            for x in range(featureCount):
+                data[x].append(dict(name=names[x], value=row[x]))
+                # print(data[x])
 
 # Discretize data
-    # Call script; create new version of data set
-    # Discretize both features
+# Call script; create new version of data set
+# Discretize all features
 
 # ID3(data, class label, available attributes to split on)
-    # Create a root node for the tree
-    # Base cases:
-    # If all examples are positive
-        # return the single-node tree root with label =+
-    # If all examples are negative
-        # return the single-node tree root with label =-
-    # No attributes left to split on
-        # return the single-node tree root with label =most common value of target attribute
-    # Otherwise, begin:
-        # Use info gain to select attribute, becomes value of node
-        # Info gain(data, attribute) = entropy(data)-[avg. entropy of subsets by splitting on A]
-        # G(D,A)=E(D)-sigma of v exists in values(A)[|Dv|/|D| * E(Dv)]
-        # Entropy(data) = -sigma of i[Pi * log base 2(Pi)]
-        # Pi = # samples of class i in data / # samples in data
-        # Split on feature with highest gain
-        # Construct node for attribute or assign to node
-        # For each value in attribute add children
-            # Add new tree branch below root for value(s) A=vi
+# Create a root node for the tree
+# Base cases:
+# If all examples are positive
+# return the single-node tree root with label =+
+# If all examples are negative
+# return the single-node tree root with label =-
+# No attributes left to split on
+# return the single-node tree root with label =most common value of target attribute
+# Otherwise, begin:
+# Use info gain to select attribute, becomes value of node
+# Info gain(data, attribute) = entropy(data)-[avg. entropy of subsets by splitting on A]
+# G(D,A)=E(D)-sigma of v exists in values(A)[|Dv|/|D| * E(Dv)]
+# Entropy(data) = -sigma of i[Pi * log base 2(Pi)]
+# Pi = # samples of class i in data / # samples in data
+# Split on feature with highest gain
+# Construct node for attribute or assign to node
+# For each value in attribute add children
+# Add new tree branch below root for value(s) A=vi
 
-            # Let examples(vi) be subset of examples that have value vi for A
-            # Get subset of data where attribute A=vi -- divide data into subsets
+# Let examples(vi) be subset of examples that have value vi for A
+# Get subset of data where attribute A=vi -- divide data into subsets
 
-            # If examples(vi) is empty
-            # No examples where A=vi -> child becomes leaf, create leaf (majority class label)
+# If examples(vi) is empty
+# No examples where A=vi -> child becomes leaf, create leaf (majority class label)
 
-            # Else below this branch add subtree ID3(examples(vi), class label, attributes-{A})
-            # Make recursive call with subset of data and attributes list without current attribute
-            # Note: Attributes can be reused if on different subtrees
-            # Important: Scope of attributes-{A} pass by copy not by reference
-    # End
-    # Return root
+# Else below this branch add subtree ID3(examples(vi), class label, attributes-{A})
+# Make recursive call with subset of data and attributes list without current attribute
+# Note: Attributes can be reused if on different subtrees
+# Important: Scope of attributes-{A} pass by copy not by reference
+# End
+# Return root
 
 # Visualize classifiers (matplotlib)
 

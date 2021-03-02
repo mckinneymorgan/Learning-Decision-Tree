@@ -17,7 +17,11 @@ featureNamesExist = input("Are the features named (Y/N): ")
 if featureNamesExist.lower() == 'y':
     featureNames = True
 
+names = []
 data = []
+classLabelName = '0'
+classLabels = []
+# Read file
 with open(file) as csvfile:
     readCSV = csv.reader(csvfile, delimiter=',')
 
@@ -26,10 +30,13 @@ with open(file) as csvfile:
     if not classLabelFileExist:
         featureCount -= 1
     csvfile.seek(0)
+    print("Feature count: ")
     print(featureCount)
 
+    # Create data list of lists
     for x in range(featureCount):
         data.append([])
+    print("Empty data list: ")
     print(data)
 
     # Name features, if provided
@@ -39,25 +46,42 @@ with open(file) as csvfile:
             names.pop()
         csvfile.seek(0)
     else:
-        names = range(0, featureCount)
+        for x in range(featureCount):
+            names.append(x)
+    print("Names: ")
     print(names)
 
-    if not featureNames:
-        for row in readCSV:
-            for x in range(featureCount):  # Populate value
-                data[x].append(dict(name=x, value=row[x]))
-                # print(data[x])
+    # Populate data list
+    for row in readCSV:
+        for x in range(featureCount):
+            data[x].append(dict(name=names[x], value=row[x]))
+    print("Populated data list: ")
+    print(data)
 
-    else:
-        names = next(readCSV)
-        # print(names)
+    # Populate class list
+    if not classLabelFileExist:
+        csvfile.seek(0)
         for row in readCSV:
-            for x in range(featureCount):
-                data[x].append(dict(name=names[x], value=row[x]))
-                # print(data[x])
+            classLabels.append(row[featureCount])
 
-# Discretize data
-# Call script; create new version of data set
+# Open class label file if applicable
+if classLabelFileExist:
+    with open(classLabelFile) as csvfile:
+        readCSV = csv.reader(csvfile, delimiter=',')
+
+        # Populate class list
+        if featureNamesExist:
+            classLabelName = next(readCSV)
+        for row in readCSV:
+            classLabels.append(row[0])
+
+print("Class label name: ")
+print(classLabelName)
+print("Class labels: ")
+print(classLabels)
+
+# Discretize data; create new version of data set
+discretizedData = discretization.equidistantbins(data)
 # Discretize all features
 
 # ID3(data, class label, available attributes to split on)
@@ -94,5 +118,3 @@ with open(file) as csvfile:
 # Return root
 
 # Visualize classifiers (matplotlib)
-
-print("\nComplete.")

@@ -81,8 +81,8 @@ print("Class labels: ")
 print(classLabels)
 
 # Discretize data; create new version of data set
-discretizedData = discretization.equidistantbins(data)
-# Discretize all features
+binNum = 5
+# discretizedData = discretization.equidistant_bins(data, binNum)
 
 # ID3(data, class label, available attributes to split on)
 # Create a root node for the tree

@@ -33,12 +33,6 @@ with open(file) as csvfile:
     print("Feature count: ")
     print(featureCount)
 
-    # Create data list of lists
-    for x in range(featureCount):
-        data.append([])
-    print("Empty data list: ")
-    print(data)
-
     # Name features, if provided
     if featureNames:
         names = next(readCSV)
@@ -52,9 +46,16 @@ with open(file) as csvfile:
     print(names)
 
     # Populate data list
+    rowNum = 0
     for row in readCSV:
+        rowDict = dict(id=rowNum)
         for x in range(featureCount):
-            data[x].append(dict(name=names[x], value=row[x]))
+            featureKey = 'feature'+str(x)
+            valueKey = 'value'+str(x)
+            rowDict[featureKey] = names[x]
+            rowDict[valueKey] = row[x]
+        data.append(rowDict)
+        rowNum += 1
     print("Populated data list: ")
     print(data)
 
@@ -82,7 +83,7 @@ print(classLabels)
 
 # Discretize data; create new version of data set
 binNum = 5
-# discretizedData = discretization.equidistant_bins(data, binNum)
+#  discretizedData = discretization.equidistant_bins(data, binNum)
 
 # ID3(data, class label, available attributes to split on)
 # Create a root node for the tree

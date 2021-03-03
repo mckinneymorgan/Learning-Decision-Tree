@@ -17,9 +17,18 @@ featureNamesExist = input("Are the features named (Y/N): ")
 if featureNamesExist.lower() == 'y':
     featureNames = True
 
+# Notes:
+# file = open("file.txt", "r")
+    # lines = file.readlines()
+    # lines = lines.rstrip("\n")
+    # lines = lines.split(",")
+    # lines[0]
+    # lines[0][1]
+# partitionedData = [x for x in data if x[bestFeature] == split]
+
 names = []
 data = []
-classLabelName = '0'
+classLabelName = 0
 classLabels = []
 # Read file
 with open(file) as csvfile:
@@ -38,7 +47,6 @@ with open(file) as csvfile:
         names = next(readCSV)
         if not classLabelFileExist:
             names.pop()
-        csvfile.seek(0)
     else:
         for x in range(featureCount):
             names.append(x)
@@ -46,18 +54,12 @@ with open(file) as csvfile:
     print(names)
 
     # Populate data list
-    rowNum = 0
     for row in readCSV:
-        rowDict = dict(id=rowNum)
+        rowList = []
         for x in range(featureCount):
-            featureKey = 'feature'+str(x)
-            valueKey = 'value'+str(x)
-            rowDict[featureKey] = names[x]
-            rowDict[valueKey] = row[x]
-        data.append(rowDict)
-        rowNum += 1
-    print("Populated data list: ")
-    print(data)
+            rowEntry = float(row[x])
+            rowList.append(rowEntry)
+        data.append(rowList)
 
     # Populate class list
     if not classLabelFileExist:
@@ -78,12 +80,25 @@ if classLabelFileExist:
 
 print("Class label name: ")
 print(classLabelName)
-print("Class labels: ")
-print(classLabels)
+
+# Append class labels to data set
+entry = -1
+for x in data:
+    entry += 1
+    classLabel = classLabels[entry]
+    if classLabel == 'True':
+        classLabel = 1
+    elif classLabel == 'False':
+        classLabel = 0
+    else:
+        classLabel = int(classLabel)
+    data[entry].append(classLabel)
+print("Data with labels: ")
+print(data)
 
 # Discretize data; create new version of data set
 binNum = 5
-#  discretizedData = discretization.equidistant_bins(data, binNum)
+newData = discretization.equidistant_bins(data, featureCount, binNum)
 
 # ID3(data, class label, available attributes to split on)
 # Create a root node for the tree

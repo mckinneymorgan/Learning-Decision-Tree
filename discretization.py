@@ -21,7 +21,7 @@ def equidistant_bins(data, bin_num):
 
         # Determine bin width for feature
         width = value_range / bin_num
-        width = math.floor(width)
+        width = math.ceil(width)
         width_list.append(width)
 
     entry = -1

@@ -98,9 +98,9 @@ print(data)
 
 # Discretize data; create new version of data set
 binNum = 5
-newData = discretization.equidistant_bins(data, featureCount, binNum)
+newData = discretization.equidistant_bins(data, binNum)
 
-# ID3(data, class label, available attributes to split on)
+# ID3(data, class label, available attributes to split on, depth)
 # Create a root node for the tree
 # Base cases:
 # If all examples are positive
@@ -109,6 +109,8 @@ newData = discretization.equidistant_bins(data, featureCount, binNum)
 # return the single-node tree root with label =-
 # No attributes left to split on
 # return the single-node tree root with label =most common value of target attribute
+# Max depth met
+# Create leaf
 # Otherwise, begin:
 # Use info gain to select attribute, becomes value of node
 # Info gain(data, attribute) = entropy(data)-[avg. entropy of subsets by splitting on A]

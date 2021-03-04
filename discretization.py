@@ -1,36 +1,48 @@
 # Original author: Morgan McKinney
 
-def equidistant_bins(data, features, bin_num):
+import math
+
+
+def equidistant_bins(data, bin_num):
     new_data = []
     min_list = []
     width_list = []
-    feature_count = -1
-    for x in features:  # For every feature
+    feature_count = len(data[0])-1
+    print("Feature count: ")
+    print(feature_count)
+    for x in range(feature_count):  # For every feature
         # Determine feature value range
-        feature_count += 1
-        feature_name = 'feature' + str(x)
-        max_value = max(item[feature_name] for item in data)
-        min_value = min(item[feature_name] for item in data)
+        max_value = max(map(lambda l: l[x], data))
+        min_value = min(map(lambda l: l[x], data))
+        max_value = math.ceil(max_value)
+        min_value = math.floor(min_value)
         min_list.append(min_value)
         value_range = max_value - min_value
 
         # Determine bin width for feature
         width = value_range / bin_num
+        width = math.floor(width)
         width_list.append(width)
 
+    entry = -1
     for x in data:  # For every entry
-        row_dict = dict(id=x)
-        for y in features:  # For every feature
+        entry += 1
+        new_row = []
+        for y in range(feature_count):  # For every feature
             # Assign values to bins
-            bin_min = min_list[y]
-            bin_max = min_list[y]
-            for z in bin_num:  # For every bin
-                # Find all values in range of bin
-                for key, value in data[x].items():
-                    if bin_min <= int(value) <= bin_max:
-                        result[key] = value
-                # Reassign values into bin
-        new_data.append(row_dict)
+            bin_max = min_list[y] + width_list[y]
+            bin_min = bin_max - width_list[y]
+            bin_val = math.ceil(bin_min + width_list[y]/2)
+            for z in range(bin_num):  # For every bin
+                # Reassign value into bin if it fits
+                if bin_min <= data[entry][y] <= bin_max:
+                    new_row.append(bin_val)
+                # Adjust local bin max and min
+                bin_max += width_list[y]
+                bin_min += width_list[y]
+                bin_val += width_list[y]
+        new_row.append(data[entry][feature_count])  # Add class labels back
+        new_data.append(new_row)
 
     print("Discretized:")
     print(new_data)

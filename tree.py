@@ -1,13 +1,31 @@
 # Original author: Morgan McKinney 3/2021
 
 from anytree import *
-
+import math
 
 """class Node:
     def __init__(self):
         self.prediction = -1
         self.feature = -1
         self.children = {}"""
+
+
+def entropy(data):
+    e = 0
+    feature_column = len(data[0])-1
+    positive_labels = 0
+    negative_labels = 0
+    for x in data:  # Find amount of each label
+        if data[x][feature_column] == 1:
+            positive_labels += 1
+        else:
+            negative_labels += 1
+    # Calculate each pi
+    pp = positive_labels / len(data)
+    pn = negative_labels / len(data)
+    # Entropy calculation
+    e = - pp * math.log(pp, 2) - pn * math.log(pn, 2)
+    return e
 
 
 def info_gain(data, feature):
@@ -25,15 +43,15 @@ def id3(data, features, depth):
     # Create a root node for the tree
     root = Node("root", prediction=-1, feature=-1)
     # Base cases:
-    if all(elements == data[0][feature_column] for elements in data): # All positive examples
+    if all(elements == data[0][feature_column] for elements in data):  # All positive examples
         # Return the single-node tree root with label = +
         root.prediction = 1
         return root
-    elif all(elements == data[0][feature_column] for elements in data): # All negative examples
+    elif all(elements == data[0][feature_column] for elements in data):  # All negative examples
         # Return the single-node tree root with label =-
         root.prediction = 0
         return root
-    elif not features or depth >= 3: # No attributes left to split on or max depth met
+    elif (not features) or (depth >= 3):  # No attributes left to split on or max depth met
         # Return the single-node tree root with label = most common value of target attribute
         positive_labels = 0
         negative_labels = 0

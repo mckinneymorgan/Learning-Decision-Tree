@@ -1,8 +1,9 @@
-# Original author: Morgan McKinney
+# Original author: Morgan McKinney 3/2021
 
-import anytree
+import tree
 import discretization
 import csv
+import copy
 
 # User input, get filename(s)
 print("MACHINE LEARNING DECISION TREE \n")
@@ -17,20 +18,11 @@ featureNamesExist = input("Are the features named (Y/N): ")
 if featureNamesExist.lower() == 'y':
     featureNames = True
 
-# Notes:
-# file = open("file.txt", "r")
-    # lines = file.readlines()
-    # lines = lines.rstrip("\n")
-    # lines = lines.split(",")
-    # lines[0]
-    # lines[0][1]
-# partitionedData = [x for x in data if x[bestFeature] == split]
-
+# Read file
 names = []
 data = []
 classLabelName = 0
 classLabels = []
-# Read file
 with open(file) as csvfile:
     readCSV = csv.reader(csvfile, delimiter=',')
 
@@ -99,40 +91,15 @@ print(data)
 # Discretize data; create new version of data set
 binNum = 5
 newData = discretization.equidistant_bins(data, binNum)
+newDataCopy = copy.deepcopy(newData)
 
-# ID3(data, class label, available attributes to split on, depth)
-# Create a root node for the tree
-# Base cases:
-# If all examples are positive
-# return the single-node tree root with label =+
-# If all examples are negative
-# return the single-node tree root with label =-
-# No attributes left to split on
-# return the single-node tree root with label =most common value of target attribute
-# Max depth met
-# Create leaf
-# Otherwise, begin:
-# Use info gain to select attribute, becomes value of node
-# Info gain(data, attribute) = entropy(data)-[avg. entropy of subsets by splitting on A]
-# G(D,A)=E(D)-sigma of v exists in values(A)[|Dv|/|D| * E(Dv)]
-# Entropy(data) = -sigma of i[Pi * log base 2(Pi)]
-# Pi = # samples of class i in data / # samples in data
-# Split on feature with highest gain
-# Construct node for attribute or assign to node
-# For each value in attribute add children
-# Add new tree branch below root for value(s) A=vi
-
-# Let examples(vi) be subset of examples that have value vi for A
-# Get subset of data where attribute A=vi -- divide data into subsets
-
-# If examples(vi) is empty
-# No examples where A=vi -> child becomes leaf, create leaf (majority class label)
-
-# Else below this branch add subtree ID3(examples(vi), class label, attributes-{A})
-# Make recursive call with subset of data and attributes list without current attribute
-# Note: Attributes can be reused if on different subtrees
-# Important: Scope of attributes-{A} pass by copy not by reference
-# End
-# Return root
+# ID3 algorithm; create tree
+depthMax = 3
+depthCurrent = 0
+featuresAvailable = []
+for x in range(len(data[0])-1):
+    featuresAvailable.append(names[x])
+print(featuresAvailable)
+decisionTree = tree.id3(newDataCopy, featuresAvailable, depthCurrent)
 
 # Visualize classifiers (matplotlib)

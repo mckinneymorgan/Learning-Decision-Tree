@@ -29,13 +29,15 @@ def equidistant_bins(data, bin_num):
         entry += 1
         new_row = []
         for y in range(feature_count):  # For every feature
+            if feature_count > 8:
+                new_row.append(int(data[entry][y]))
             # Assign values to bins
             bin_max = min_list[y] + width_list[y]
             bin_min = min_list[y]
             bin_val = math.ceil(bin_min + width_list[y]/2)
             for z in range(bin_num):  # For every bin
                 # Reassign value into bin if it fits
-                if bin_min <= data[entry][y] <= bin_max:
+                if (bin_min <= data[entry][y] <= bin_max) and feature_count <= 8:
                     new_row.append(bin_val)
                 # Adjust local bin max and min
                 bin_max += width_list[y]
@@ -43,7 +45,4 @@ def equidistant_bins(data, bin_num):
                 bin_val += width_list[y]
         new_row.append(data[entry][feature_count])  # Add class labels back
         new_data.append(new_row)
-
-    print("Discretized data:")
-    print(new_data)
     return new_data

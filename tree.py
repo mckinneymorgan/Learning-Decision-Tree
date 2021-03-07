@@ -84,8 +84,10 @@ def id3(data, features, feature_list, depth, iteration):
         # Return the single-node tree root with label = most common value of target attribute
         positive_labels = 0
         negative_labels = 0
+        entry = -1
         for x in data:  # Find most common class label
-            if data[x][feature_column] == 1:
+            entry += 1
+            if data[entry][feature_column] == 1:
                 positive_labels += 1
             else:
                 negative_labels += 1
@@ -139,7 +141,6 @@ def id3(data, features, feature_list, depth, iteration):
             # Add new tree branch below root for value(s) A=vi
             value += 1
             iteration += 1
-            print(iteration)
             branch_name = str(iteration)
 
             # Let examples(vi) be subset of examples that have value vi for A
@@ -152,8 +153,10 @@ def id3(data, features, feature_list, depth, iteration):
                 leaf = Node(branch_name, parent=root, prediction=-1, feature=-1)
                 positive_labels = 0
                 negative_labels = 0
+                entry = -1
                 for x in data:  # Find most common class label
-                    if data[x][feature_index] == 1:
+                    entry += 1
+                    if data[entry][feature_index] == 1:
                         positive_labels += 1
                     else:
                         negative_labels += 1
@@ -164,8 +167,10 @@ def id3(data, features, feature_list, depth, iteration):
             # Else below this branch add subtree ID3(examples(vi), class label, attributes-{A})
             else:
                 # Make recursive call with subset of data and attributes list without current attribute
+                branch = Node(branch_name, parent=root, prediction=-1, feature=-1)
                 feature_subset = copy.deepcopy(features)
-                id3(data, feature_subset, feature_list, depth+1, iteration+1)
+                feature_subset = feature_subset.remove(features[max_gain_index])
+                branch.children = [id3(data, feature_subset, feature_list, depth+1, iteration+1)]
                 # Note: Attributes can be reused if on different subtrees
                 # Important: Scope of attributes-{A} pass by copy not by reference
     return root

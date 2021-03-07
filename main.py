@@ -1,8 +1,10 @@
 # Original author: Morgan McKinney 3/2021
 
+from anytree import *
 import tree
 import discretization
 import csv
+import copy
 
 # User input, get filename(s)
 print("MACHINE LEARNING DECISION TREE \n")
@@ -84,8 +86,6 @@ for x in data:
     else:
         classLabel = int(classLabel)
     data[entry].append(classLabel)
-print("Data with labels: ")
-print(data)
 
 # Discretize data; create new version of data set
 binNum = 5
@@ -102,5 +102,6 @@ for x in range(len(data[0])-1):
     featuresList.append(names[x])
 iteration = 0
 decisionTree = tree.id3(newDataCopy, featuresAvailable, featuresList, depthCurrent, iteration)
+print(RenderTree(decisionTree))
 
 # Visualize classifiers (matplotlib)

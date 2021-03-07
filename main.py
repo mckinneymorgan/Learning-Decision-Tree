@@ -3,7 +3,6 @@
 import tree
 import discretization
 import csv
-import copy
 
 # User input, get filename(s)
 print("MACHINE LEARNING DECISION TREE \n")
@@ -31,7 +30,7 @@ with open(file) as csvfile:
     if not classLabelFileExist:
         featureCount -= 1
     csvfile.seek(0)
-    print("Feature count: ")
+    print("\nFeature count: ")
     print(featureCount)
 
     # Name features, if provided
@@ -97,9 +96,11 @@ newDataCopy = copy.deepcopy(newData)
 depthMax = 3
 depthCurrent = 0
 featuresAvailable = []
+featuresList = []
 for x in range(len(data[0])-1):
     featuresAvailable.append(names[x])
-print(featuresAvailable)
-decisionTree = tree.id3(newDataCopy, featuresAvailable, depthCurrent)
+    featuresList.append(names[x])
+iteration = 0
+decisionTree = tree.id3(newDataCopy, featuresAvailable, featuresList, depthCurrent, iteration)
 
 # Visualize classifiers (matplotlib)

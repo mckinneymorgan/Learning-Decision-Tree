@@ -8,8 +8,6 @@ def equidistant_bins(data, bin_num):
     min_list = []
     width_list = []
     feature_count = len(data[0])-1
-    print("Feature count: ")
-    print(feature_count)
     for x in range(feature_count):  # For every feature
         # Determine feature value range
         max_value = max(map(lambda l: l[x], data))
@@ -23,7 +21,9 @@ def equidistant_bins(data, bin_num):
         width = value_range / bin_num
         width = math.ceil(width)
         width_list.append(width)
-
+    print("Width list, min. value list: ")
+    print(width_list)
+    print(min_list)
     entry = -1
     for x in data:  # For every entry
         entry += 1
@@ -31,7 +31,7 @@ def equidistant_bins(data, bin_num):
         for y in range(feature_count):  # For every feature
             # Assign values to bins
             bin_max = min_list[y] + width_list[y]
-            bin_min = bin_max - width_list[y]
+            bin_min = min_list[y]
             bin_val = math.ceil(bin_min + width_list[y]/2)
             for z in range(bin_num):  # For every bin
                 # Reassign value into bin if it fits
@@ -44,6 +44,6 @@ def equidistant_bins(data, bin_num):
         new_row.append(data[entry][feature_count])  # Add class labels back
         new_data.append(new_row)
 
-    print("Discretized:")
+    print("Discretized data:")
     print(new_data)
     return new_data

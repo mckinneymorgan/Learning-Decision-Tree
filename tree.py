@@ -13,6 +13,8 @@ import copy
 
 def entropy(data):
     feature_column = len(data[0]) - 1
+    if feature_column > 44:  # Temporary fix for fluctuating data length
+        feature_column = 44
     positive_labels = 0
     negative_labels = 0
     entry = -1
@@ -38,15 +40,12 @@ def entropy(data):
 def info_gain(data, feature, feature_list):
     sigma = 0
     feature_index = feature_list.index(feature)
-    values = []
+    values = [data[0][feature_index]]
     entry = -1
     for x in data:  # Find amount of unique values
         entry += 1
-        if entry == 0:
+        if data[entry][feature_index] not in values:
             values.append(data[entry][feature_index])
-        else:
-            if data[entry][feature_index] not in values:
-                values.append(data[entry][feature_index])
     value_count = [0] * len(values)
     entry = -1
     for x in data:  # Find occurrences of each value
@@ -65,23 +64,29 @@ def info_gain(data, feature, feature_list):
     return gain
 
 
-def id3(data, features, feature_list, depth, iteration):
+def id3(data, features, feature_list):
     # Create a root node for the tree
     feature_column = len(data[0]) - 1
-    root_name = str(iteration)
-    root = Node(root_name, parent=None, prediction=-1, feature=-1)
+    if feature_column > 44:  # Temporary fix for fluctuating data length
+        feature_column = 44
+    root = Node("Root", parent=None, prediction=-1, feature=-1, val=-1)
+    if root.depth > 0:
+        root.name = "Branch"
 
     # Base cases:
-    if all(elements == data[0][feature_column] for elements in data):  # All positive examples
+    if all(elements[feature_column] == 1 for elements in data):  # All positive examples
         # Return the single-node tree root with label = +
+        root.name = "Leaf"
         root.prediction = 1
         return root
-    elif all(elements == data[0][feature_column] for elements in data):  # All negative examples
+    elif all(elements[feature_column] == 0 for elements in data):  # All negative examples
         # Return the single-node tree root with label =-
+        root.name = "Leaf"
         root.prediction = 0
         return root
-    elif (not features) or (depth >= 3):  # No attributes left to split on or max depth met
+    elif (not features) or (root.depth >= 3):  # No attributes left to split on or max depth met
         # Return the single-node tree root with label = most common value of target attribute
+        root.name = "Leaf"
         positive_labels = 0
         negative_labels = 0
         entry = -1
@@ -140,8 +145,6 @@ def id3(data, features, feature_list, depth, iteration):
         for v in values:
             # Add new tree branch below root for value(s) A=vi
             value += 1
-            iteration += 1
-            branch_name = str(iteration)
 
             # Let examples(vi) be subset of examples that have value vi for A
             # Get subset of data where attribute A=vi -- divide data into subsets
@@ -150,7 +153,7 @@ def id3(data, features, feature_list, depth, iteration):
             # If examples(vi) is empty
             if not partitioned_data:
                 # Child becomes leaf, create leaf (majority class label)
-                leaf = Node(branch_name, parent=root, prediction=-1, feature=-1)
+                leaf = Node("Leaf", parent=root, prediction=-1, feature=feature_index, val=values[value])
                 positive_labels = 0
                 negative_labels = 0
                 entry = -1
@@ -167,10 +170,13 @@ def id3(data, features, feature_list, depth, iteration):
             # Else below this branch add subtree ID3(examples(vi), class label, attributes-{A})
             else:
                 # Make recursive call with subset of data and attributes list without current attribute
-                branch = Node(branch_name, parent=root, prediction=-1, feature=-1)
+                # Referenced: Jainam helped clarify AnyTree syntax for recursion
                 feature_subset = copy.deepcopy(features)
-                feature_subset = feature_subset.remove(features[max_gain_index])
-                branch.children = [id3(data, feature_subset, feature_list, depth+1, iteration+1)]
+                element = features[max_gain_index]
+                feature_subset = [x for x in feature_subset if x != element]
+                branch = id3(partitioned_data, feature_subset, feature_list)
+                branch.parent = root
+                branch.val = values[value]
                 # Note: Attributes can be reused if on different subtrees
                 # Important: Scope of attributes-{A} pass by copy not by reference
     return root
